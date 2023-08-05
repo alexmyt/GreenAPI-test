@@ -8,12 +8,19 @@ import logger from './logger/logger.service';
 async function bootstrap(): Promise<void> {
   await rabbitClient.initialize(logger);
 
-  const server = http.createServer(async (req, res) => {
+  const server = http.createServer();
+
+  server.on('request', async (req, res) => {
     const chunks: string[] = [];
     req.on('data', (chunk) => chunks.push(chunk));
 
     req.on('end', async () => {
-      const body = JSON.parse(chunks.join('\n'));
+      let body: Record<string, unknown> | undefined;
+      try {
+        body = JSON.parse(chunks.join('\n'));
+      } catch (error) {
+        body = undefined;
+      }
 
       const message = TaskService.fromRequest(req, body);
 
@@ -28,6 +35,8 @@ async function bootstrap(): Promise<void> {
   server.on('error', (err: Error & { code: string }) => {
     if (err?.code === 'EACCES') {
       logger.error(`No access to port: ${HTTP_PORT}`);
+    } else {
+      logger.error(err, 'Error');
     }
   });
 

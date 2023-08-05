@@ -3,7 +3,7 @@ import { IncomingMessage } from 'node:http';
 import { Task, TaskType } from '../interfaces';
 
 export default class TaskService {
-  public static fromRequest(req: IncomingMessage, body: Record<string, unknown>): Task {
+  public static fromRequest(req: IncomingMessage, body: Record<string, unknown> | undefined): Task {
     const RequestToTaskMap = {
       'get /echo': this.echoTask,
     };
@@ -15,7 +15,7 @@ export default class TaskService {
   }
 
   private static undefinedTask(): Task {
-    return { taskType: TaskType.UNKNOWN, taskData: {} };
+    return { taskType: TaskType.UNKNOWN };
   }
 
   private static echoTask(req: IncomingMessage, body: Record<string, unknown>): Task {

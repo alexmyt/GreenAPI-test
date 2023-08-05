@@ -7,5 +7,5 @@ export enum TaskType {
 
 export interface Task {
   taskType: TaskType;
-  taskData: Record<string, unknown>;
+  taskData?: Record<string, unknown> | undefined;
 }
