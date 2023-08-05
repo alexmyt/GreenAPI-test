@@ -1,5 +1,11 @@
 {
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "cSpell.words": [
+    "Casl",
+    "pino",
+    "rabbitmq",
     "tstemplate"
   ]
 }
