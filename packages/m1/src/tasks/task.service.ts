@@ -2,31 +2,21 @@ import { IncomingMessage } from 'node:http';
 
 import { Task, TaskType } from '../interfaces';
 
-export default class TaskService {
-  public static fromRequest(req: IncomingMessage, body: Record<string, unknown> | undefined): Task {
-    const RequestToTaskMap = {
-      'get /echo': this.echoTask,
-    };
+import echoTask from './echo.task';
 
+export default class TaskService {
+  private static RequestToTaskMap = {
+    'get /echo': echoTask,
+  };
+
+  public static fromRequest(req: IncomingMessage, body: Record<string, unknown> | undefined): Task {
     const { method, url } = req;
 
-    const task = RequestToTaskMap[`${method} ${url}`.toLocaleLowerCase()];
-    return task ? task(req, body) : this.undefinedTask();
+    const task = TaskService.RequestToTaskMap[`${method} ${url}`.toLocaleLowerCase()];
+    return task ? task(req, body) : this.unknownTask();
   }
 
-  private static undefinedTask(): Task {
+  private static unknownTask(): Task {
     return { taskType: TaskType.UNKNOWN };
-  }
-
-  private static echoTask(req: IncomingMessage, body: Record<string, unknown>): Task {
-    return {
-      taskType: TaskType.ECHO,
-      taskData: {
-        method: req.method,
-        url: req.url,
-        headers: req.headers,
-        body,
-      },
-    };
   }
 }
