@@ -8,7 +8,11 @@ export default class RabbitClientConsumer {
   constructor(private channel: Channel, private logger: Logger) {}
 
   async consumeMessages(messageHandler: MessageHandler): Promise<void> {
-    this.channel.consume(AMQP_QUEUE_NAME, (message: ConsumeMessage) => {
+    this.channel.consume(AMQP_QUEUE_NAME, async (message: ConsumeMessage | null) => {
+      if (message === null) {
+        return;
+      }
+
       const messageContent = JSON.parse(message.content.toString());
 
       const { correlationId, replyTo } = message.properties;
@@ -17,7 +21,13 @@ export default class RabbitClientConsumer {
         return;
       }
 
-      messageHandler.handle(messageContent, correlationId, replyTo);
+      try {
+        await messageHandler.handle(messageContent, correlationId, replyTo);
+      } catch (error) {
+        this.logger.error({ correlationId, replyTo, error }, 'Error while handle message');
+      }
+
+      this.channel.ack(message);
     });
   }
 }

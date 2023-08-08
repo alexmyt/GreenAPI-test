@@ -34,6 +34,10 @@ export class RabbitClient {
   /** Instance of class that consume replies from queue */
   private consumer: RabbitClientConsumer;
 
+  private constructor() {
+    this.isInitialized = false;
+  }
+
   public static getInstance(): RabbitClient {
     if (!this.instance) {
       this.instance = new RabbitClient();
@@ -41,7 +45,11 @@ export class RabbitClient {
     return this.instance;
   }
 
-  async initialize(logger: Logger): Promise<void> {
+  /**
+   * Initializes the RabbitMQ client
+   * @param logger - The logger instance
+   */
+  public async initialize(logger: Logger): Promise<void> {
     if (this.isInitialized) {
       return;
     }
@@ -71,12 +79,17 @@ export class RabbitClient {
     this.consumer.consumeMessages();
 
     this.isInitialized = true;
-    logger.info('RabbitMQ client is initialized');
+    this.logger.info('RabbitMQ client is initialized');
   }
 
-  async produce<T = RabbitMessage>(message: T): Promise<T> {
+  /**
+   * Produces a message to the RabbitMQ server
+   * @param message - The message to produce
+   * @returns A promise that resolves with the reply from the server
+   */
+  public async produce<T = RabbitMessage>(message: T): Promise<T> {
     if (!this.isInitialized) {
-      throw new Error('Rabbit clien is not initialized...');
+      throw new Error('Rabbit client is not initialized...');
     }
     return this.producer.produceMessage(message);
   }
