@@ -1,7 +1,7 @@
 import { Channel, Connection, connect } from 'amqplib';
 
 import { AMQP_QUEUE_NAME, RABBIT_URL } from '../constants';
-import { RabbitMessage } from '../interfaces';
+import { MessageHandlerClass, RabbitMessage } from '../interfaces';
 import { Logger } from '../logger/logger.interface';
 
 import RabbitClientProducer from './producer';
@@ -26,6 +26,10 @@ export class RabbitClient {
   private producer: RabbitClientProducer;
 
   private consumer: RabbitClientConsumer;
+
+  private constructor() {
+    this.isInitialized = false;
+  }
 
   public static getInstance(): RabbitClient {
     if (!this.instance) {
@@ -55,7 +59,11 @@ export class RabbitClient {
     this.logger.info('RabbitMQ client is initialized');
   }
 
-  public async consume(messageHandler): Promise<void> {
+  public consume(messageHandler: MessageHandlerClass): void {
+    if (!this.isInitialized) {
+      throw new Error('RabbitMQ client is not initialized');
+    }
+
     this.consumer.consumeMessages(messageHandler);
   }
 
@@ -68,6 +76,10 @@ export class RabbitClient {
       throw new Error('RabbitMQ client is not initialized');
     }
     return this.producer.produceMessage(message, correlationId, replyToQueue);
+  }
+
+  public async destroy(): Promise<void> {
+    await this.connection.close();
   }
 }
 

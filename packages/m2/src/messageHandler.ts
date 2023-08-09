@@ -1,7 +1,7 @@
-import { RabbitMessage, Task } from './interfaces';
+import { MessageHandlerClass, RabbitMessage, Task } from './interfaces';
 import { type RabbitClient } from './rabbitmq/client';
 
-export default class MessageHandler {
+export default class MessageHandler implements MessageHandlerClass {
   constructor(private readonly client: RabbitClient) {}
 
   async handle(message: RabbitMessage, correlationId: string, replyTo: string): Promise<void> {

@@ -10,6 +10,6 @@ export interface Task {
   taskData: Record<string, unknown>;
 }
 
-export interface MessageHandler {
+export interface MessageHandlerClass {
   handle: (message: RabbitMessage, correlationId: string, replyTo: string) => Promise<void>;
 }

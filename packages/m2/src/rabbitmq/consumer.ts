@@ -1,7 +1,7 @@
 import { Channel, ConsumeMessage } from 'amqplib';
 
 import { AMQP_QUEUE_NAME } from '../constants';
-import { MessageHandler } from '../interfaces';
+import { MessageHandlerClass } from '../interfaces';
 import { Logger } from '../logger/logger.interface';
 
 export default class RabbitClientConsumer {
@@ -12,7 +12,7 @@ export default class RabbitClientConsumer {
    * @param {MessageHandler} messageHandler - The message handler object with a handle method.
    * @returns {Promise<void>} A promise that resolves when consuming is complete.
    */
-  async consumeMessages(messageHandler: MessageHandler): Promise<void> {
+  async consumeMessages(messageHandler: MessageHandlerClass): Promise<void> {
     this.channel.consume(AMQP_QUEUE_NAME, async (message: ConsumeMessage | null) => {
       if (message === null) {
         return;
