@@ -11,8 +11,10 @@ export default class RabbitClientProducer {
     correlationId: string,
     replyToQueue: string,
   ): Promise<void> {
-    this.channel.sendToQueue(replyToQueue, Buffer.from(JSON.stringify(message)), {
+    const messageContent = JSON.stringify(message);
+    this.channel.sendToQueue(replyToQueue, Buffer.from(messageContent), {
       correlationId,
     });
+    this.logger.info({ correlationId, replyToQueue, message }, 'Send to queue');
   }
 }
